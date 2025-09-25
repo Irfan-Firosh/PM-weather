@@ -22,7 +22,7 @@ async def export_weather_data(db: Session = Depends(get_db)):
         records = crud.get_weather_records(db)
         
         if not records:
-            raise HTTPException(status_code=404, detail="No weather records found to export")
+            raise HTTPException(status_code=404, detail="No records found")
         
         records_data = []
         for record in records:
@@ -47,4 +47,4 @@ async def export_weather_data(db: Session = Depends(get_db)):
         return json.loads(export_data.decode('utf-8'))
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

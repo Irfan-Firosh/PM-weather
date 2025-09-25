@@ -81,7 +81,7 @@ async def get_weather_record(
 ):
     record = crud.get_weather_record(db, record_id)
     if not record:
-        raise HTTPException(status_code=404, detail="Weather record not found")
+        raise HTTPException(status_code=404, detail="Record not found")
     return WeatherRecordResponse.from_orm(record)
 
 @router.get("/location/{location_id}", response_model=List[WeatherRecordListResponse])
@@ -100,7 +100,7 @@ async def update_weather_record(
 ):
     existing_record = crud.get_weather_record(db, record_id)
     if not existing_record:
-        raise HTTPException(status_code=404, detail="Weather record not found")
+        raise HTTPException(status_code=404, detail="Record not found")
     
     update_dict = update_data.dict(exclude_unset=True)
     
@@ -126,7 +126,7 @@ async def update_weather_record(
             del update_dict['location']
             
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Invalid location: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
     
     if update_dict.get('weather_data') is None and (update_dict.get('location_id') or update_dict.get('start_date') or update_dict.get('end_date')):
         try:
@@ -143,11 +143,11 @@ async def update_weather_record(
             update_dict['weather_data'] = weather_data
             
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to fetch updated weather data: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
     
     updated_record = crud.update_weather_record(db, record_id, update_dict)
     if not updated_record:
-        raise HTTPException(status_code=404, detail="Weather record not found")
+        raise HTTPException(status_code=404, detail="Record not found")
     
     return WeatherRecordResponse.from_orm(updated_record)
 
@@ -158,17 +158,17 @@ async def delete_weather_record(
 ):
     record = crud.delete_weather_record(db, record_id)
     if not record:
-        raise HTTPException(status_code=404, detail="Weather record not found")
-    return {"message": "Weather record deleted successfully", "deleted_id": record_id}
+        raise HTTPException(status_code=404, detail="Record not found")
+    return {"message": "Record deleted", "deleted_id": record_id}
 
 @router.get("/search/location", response_model=List[WeatherRecordListResponse])
 async def search_weather_records_by_location_name(
-    location_name: str = Query(..., description="Location name to search for"),
+    location_name: str = Query(...),
     db: Session = Depends(get_db)
 ):
     locations = db.query(crud.Location).filter(crud.Location.name.ilike(f"%{location_name}%")).all()
     if not locations:
-        raise HTTPException(status_code=404, detail="No locations found matching the search criteria")
+        raise HTTPException(status_code=404, detail="No locations found")
     
     all_records = []
     for location in locations:
@@ -179,8 +179,8 @@ async def search_weather_records_by_location_name(
 
 @router.get("/search/date-range", response_model=List[WeatherRecordListResponse])
 async def search_weather_records_by_date_range(
-    start_date: date = Query(..., description="Start date for search"),
-    end_date: date = Query(..., description="End date for search"),
+    start_date: date = Query(...),
+    end_date: date = Query(...),
     db: Session = Depends(get_db)
 ):
     if end_date <= start_date:

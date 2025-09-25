@@ -5,9 +5,7 @@ router = APIRouter(prefix="/maps", tags=["maps"])
 maps_service = MapsService()
 
 @router.get("/location-details")
-async def get_location_details(
-    location: str = Query(..., description="Location to get details for")
-):
+async def get_location_details(location: str = Query(...)):
     try:
         details = await maps_service.get_location_details(location)
         return details
@@ -16,11 +14,11 @@ async def get_location_details(
 
 @router.get("/static-map")
 async def get_static_map(
-    latitude: float = Query(..., description="Latitude"),
-    longitude: float = Query(..., description="Longitude"),
-    zoom: int = Query(10, ge=1, le=20, description="Map zoom level"),
-    size: str = Query("400x400", description="Map size (width x height)"),
-    map_type: str = Query("roadmap", description="Map type: roadmap, satellite, hybrid, terrain")
+    latitude: float = Query(...),
+    longitude: float = Query(...),
+    zoom: int = Query(10, ge=1, le=20),
+    size: str = Query("400x400"),
+    map_type: str = Query("roadmap")
 ):
     try:
         map_url = maps_service.get_static_map_url(latitude, longitude, zoom, size, map_type)

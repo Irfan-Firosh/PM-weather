@@ -9,11 +9,7 @@ import uvicorn
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    title="Weather API", 
-    description="Weather API with CRUD operations, export functionality, and Google Maps integration", 
-    version="1.0.0"
-)
+app = FastAPI(title="Weather API", version="1.0.0")
 app.include_router(weather_router)
 app.include_router(weather_crud_router)
 app.include_router(export_router)

@@ -66,17 +66,9 @@ class WeatherService:
             return result["lat"], result["lon"]
                 
         except requests.RequestException as e:
-            if e.response and e.response.status_code == 401:
-                raise Exception("Invalid API key. Please check your OpenWeatherMap API key.")
-            elif e.response and e.response.status_code == 429:
-                raise Exception("API rate limit exceeded. Please try again later.")
-            else:
-                raise Exception(f"Geocoding API error: {str(e)}")
+            raise Exception(f"API error: {str(e)}")
         except Exception as e:
-            if "not found" in str(e).lower():
-                raise e
-            else:
-                raise Exception(f"Location processing error: {str(e)}")
+            raise e
     
     async def get_current_weather(self, location: str) -> Dict:
         try:
@@ -97,14 +89,9 @@ class WeatherService:
             return self._format_current_weather(data)
             
         except requests.RequestException as e:
-            if e.response and e.response.status_code == 401:
-                raise Exception("Invalid API key. Please check your OpenWeatherMap API key.")
-            elif e.response and e.response.status_code == 429:
-                raise Exception("API rate limit exceeded. Please try again later.")
-            else:
-                raise Exception(f"Weather API error: {str(e)}")
+            raise Exception(f"API error: {str(e)}")
         except Exception as e:
-            raise Exception(f"Weather fetch error: {str(e)}")
+            raise e
     
     async def get_5day_forecast(self, location: str) -> List[Dict]:
         try:
@@ -125,14 +112,9 @@ class WeatherService:
             return self._format_5day_forecast(data)
             
         except requests.RequestException as e:
-            if e.response and e.response.status_code == 401:
-                raise Exception("Invalid API key. Please check your OpenWeatherMap API key.")
-            elif e.response and e.response.status_code == 429:
-                raise Exception("API rate limit exceeded. Please try again later.")
-            else:
-                raise Exception(f"Forecast API error: {str(e)}")
+            raise Exception(f"API error: {str(e)}")
         except Exception as e:
-            raise Exception(f"Forecast fetch error: {str(e)}")
+            raise e
     
     def _format_current_weather(self, data: Dict) -> Dict:
         return {
